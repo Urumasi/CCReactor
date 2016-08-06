@@ -29,7 +29,7 @@ local settingsPath = "data/settings"
 local function saveSettings()
   local f = fs.open(settingsPath, "w")
   if not f then return false end
-  f.write(textutils.serialize(state))
+  f.write(textutils.serialize(settings))
   f.close()
   return true
 end
