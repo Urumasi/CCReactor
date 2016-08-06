@@ -3,7 +3,7 @@ local peripheral, fs, textutils, math =
 
 local settings = {
   activateAt = 0.5,
-  deactivateAt = 0.8,
+  deactivateAt = 0.9,
   maxStored = 10e6
 }
 
@@ -45,9 +45,9 @@ end
 local function drawBar()
   paintutils.drawFilledBox(w-8, 2, w-2, h-1, colors.gray)
   local level = (w-2)*current/settings.maxStored
-  paintutils.drawFilledBox(w-8, h-1-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
+  paintutils.drawFilledBox(w-8, h-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
   if level-math.floor(level)>=0.5 then
-    paintutils.drawLine(w-8, h-2-math.floor(level), w-2, h-2-math.floor(level), charge and colors.brown or colors.green)
+    paintutils.drawLine(w-8, h-1-math.floor(level), w-2, h-1-math.floor(level), charge and colors.brown or colors.green)
   end
   term.setBackgroundColor(colors.black)
   term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
@@ -82,4 +82,6 @@ while true do
   readReactor()
   doStuff()
   drawBar()
+
+  sleep(0.5)
 end
