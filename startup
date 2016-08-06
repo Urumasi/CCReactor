@@ -9,6 +9,7 @@ local settings = {
 
 local reactor = peripheral.wrap("right")
 local monitor = peripheral.wrap("front")
+monitor.setBackgroundColor(colors.black)
 monitor.clear()
 monitor.setTextScale(0.5)
 local w, h = monitor.getSize()
@@ -37,7 +38,7 @@ local function loadSettings()
 end
 
 local function readReactor()
-  current = 1e6--reactor.getEnergyStored()
+  current = reactor.getEnergyStored()
   production = reactor.getEnergyProducedLastTick()
 end
 
@@ -46,7 +47,7 @@ local function drawBar()
   local level = (w-2)*current/settings.maxStored
   paintutils.drawFilledBox(w-8, h-1-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
   if level-math.floor(level)>=0.5 then
-    paintutis.drawLine(w-8, h-2-math.floor(level), w-2, h-2-math.floor(level), charge and colors.brown or colors.green)
+    paintutils.drawLine(w-8, h-2-math.floor(level), w-2, h-2-math.floor(level), charge and colors.brown or colors.green)
   end
   term.setBackgroundColor(colors.black)
   term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
@@ -57,6 +58,28 @@ local function drawBar()
   write("<")
 end
 
+local function doStuff()
+  local p = current/settings.maxStored
+
+  if charge and p>=settings.deactivateAt then
+    charge = false
+  end
+  if not charge and p<=settings.activateAt then
+    charge = true
+  end
+
+  if charge and not reactor.getActive() then
+    reactor.setActive(true)
+  end
+  if not charge and reactor.getActive() then
+    reactor.setActive(false)
+  end
+end
+
 loadSettings()
-readReactor()
-drawBar()
+
+while true do
+  readReactor()
+  doStuff()
+  drawBar()
+end
