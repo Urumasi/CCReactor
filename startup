@@ -78,6 +78,8 @@ local function drawInfo()
   write("Status: "..(charge and "ON " or "OFF"))
   term.setCursorPos(2, 4)
   write("Power: "..(math.floor(1000*current/settings.maxStored)/10).."%    ")
+  term.setCursorPos(2, 6)
+  write("Production: "..production.."   ")
 end
 
 local function doStuff()
