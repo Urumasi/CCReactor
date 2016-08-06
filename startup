@@ -31,7 +31,7 @@ local function loadSettings()
 end
 
 local function drawBar()
-  paintutils.drawBox(w-5, 2, w-1, h-1, colors.gray)
+  paintutils.drawFilledBox(w-8, 2, w-1, h-1, colors.gray)
 end
 
 loadSettings()
