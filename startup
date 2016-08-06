@@ -13,6 +13,7 @@ local settings = {
 rednet.open("left")
 rednet.host("power", "main")
 
+local bank = peripheral.wrap("tile_blockcapacitorbank_name_0")
 local reactor = peripheral.wrap("right")
 local monitor = peripheral.wrap("front")
 monitor.setBackgroundColor(colors.black)
@@ -96,7 +97,10 @@ local function drawInfo()
   term.setCursorPos(2, 4)
   write("Power: "..(math.floor(1000*current/settings.maxStored)/10).."%    ")
   term.setCursorPos(2, 6)
-  write("Production: "..numToString(production).."RF/t    ")
+  local str = numToString(production)
+  write("Production: "..str.."RF/t"..string.rep(" ", 5-#str))
+  term.setCursorPos(2, 8)
+  write("Capacitor: "..(math.floor(1000*bank.getEnergyStored()/bank.getMaxEnergyStored())/10).."%    ")
 end
 
 local function doStuff()
