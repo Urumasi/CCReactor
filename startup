@@ -4,6 +4,7 @@ local peripheral, fs, textutils, math =
 local settings = {
   activateAt = 0.5,
   deactivateAt = 0.8,
+  maxStored = 10e6
 }
 
 local reactor = peripheral.wrap("right")
@@ -11,6 +12,9 @@ local monitor = peripheral.wrap("front")
 monitor.setTextScale(0.5)
 local w, h = monitor.getSize()
 term.redirect(monitor)
+
+local production = 0
+local current = 0
 
 local settingsPath = "data/settings"
 
@@ -30,9 +34,16 @@ local function loadSettings()
   return true
 end
 
+local function readReactor()
+  current = reactor.getEnergyStored()
+  production = reactor.getEnergyProducedLastTick()
+end
+
 local function drawBar()
   paintutils.drawFilledBox(w-8, 2, w-1, h-1, colors.gray)
+  paintutils.drawFilledBox(w-8, w-1-math.floor((w-2)*current/settings.maxStored), w-1, h-1, colors.yellow)
 end
 
 loadSettings()
+readReactor()
 drawBar()
