@@ -40,8 +40,19 @@ local function readReactor()
 end
 
 local function drawBar()
-  paintutils.drawFilledBox(w-8, 2, w-1, h-1, colors.gray)
-  paintutils.drawFilledBox(w-8, w-1-math.floor((w-2)*current/settings.maxStored), w-1, h-1, colors.yellow)
+  paintutils.drawFilledBox(w-10, 2, w-2, h-1, colors.gray)
+  local level = (w-2)*current/settings.maxStored
+  paintutils.drawFilledBox(w-10, w-1-math.floor(level), w-2, h-1, colors.yellow)
+  if level-math.floor(level)>=0.5 then
+    paintutis.drawLine(w-10, w-2-math.floor(level), w-2, w-2-math.floor(level), colors.brown)
+  end
+  term.setBackgroundColor(colors.black)
+  term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
+  term.setTextColor(colors.lime)
+  write("<")
+  term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
+  term.setTextColor(colors.red)
+  write("<")
 end
 
 loadSettings()
