@@ -37,17 +37,25 @@ local function loadSettings()
   return true
 end
 
+local function drawRect(x1, y1, x2, y2, color)
+  term.setBackgroundColor(color)
+  for y=y1, y2 do
+    term.setCursorPos(x1, y)
+    write(string.rep(" ", x2-x1))
+  end
+end
+
 local function readReactor()
   current = reactor.getEnergyStored()
   production = reactor.getEnergyProducedLastTick()
 end
 
 local function drawBar()
-  paintutils.drawFilledBox(w-8, 2, w-2, h-1, colors.gray)
+  drawRect(w-8, 2, w-2, h-1, colors.gray)
   local level = (w-2)*current/settings.maxStored
-  paintutils.drawFilledBox(w-8, h-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
+  drawRect(w-8, h-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
   if level-math.floor(level)>=0.5 then
-    paintutils.drawLine(w-8, h-1-math.floor(level), w-2, h-1-math.floor(level), charge and colors.brown or colors.green)
+    drawRect(w-8, h-1-math.floor(level), w-2, h-1-math.floor(level), charge and colors.brown or colors.green)
   end
   term.setBackgroundColor(colors.black)
   term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
