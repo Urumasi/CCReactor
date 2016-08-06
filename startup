@@ -50,6 +50,13 @@ local function drawRect(x1, y1, x2, y2, color)
   end
 end
 
+local function numToString(n)
+  local sufix = {"", "k", "M", "G", "T", "P"}
+  local a = 1
+  while n>1000 do n = n/1000; a=a+1 end
+  return (math.floor(n*10)/10)..(sufix[a] or "?")
+end
+
 local function readReactor()
   current = reactor.getEnergyStored()
   production = reactor.getEnergyProducedLastTick()
@@ -79,7 +86,7 @@ local function drawInfo()
   term.setCursorPos(2, 4)
   write("Power: "..(math.floor(1000*current/settings.maxStored)/10).."%    ")
   term.setCursorPos(2, 6)
-  write("Production: "..production.."   ")
+  write("Production: "..numToString(production).."RF/t    ")
 end
 
 local function doStuff()
