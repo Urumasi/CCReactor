@@ -60,6 +60,20 @@ local function numToString(n)
   return (math.floor(n*10)/10)..(sufix[a] or "?")
 end
 
+local function explode(str, div)
+    assert(type(str) == "string" and type(div) == "string", "invalid arguments")
+    local o = {}
+    while true do
+        local pos1, pos2 = str:find(div)
+        if not pos1 then
+            o[#o+1] = str
+            break
+        end
+        o[#o+1], str = str:sub(1, pos1-1), str:sub(pos2+1)
+    end
+    return o
+end
+
 local function readReactor()
   current = reactor.getEnergyStored()
   production = reactor.getEnergyProducedLastTick()
@@ -149,10 +163,32 @@ while true do
       end
     end
   elseif e[1]=="rednet_message" and e[4]=="power" then
-    if e[3]=="summary" then
+    local args = explode(e[3], ";")
+    if args[1]=="summary" then
       rednet.send(e[2], "Status: "..(charge and "ON" or "OFF")
         .."\nPower: "..(math.floor(1000*current/settings.maxStored)/10).."%"
         .."\nProduction: "..numToString(production).."RF/t", "power")
+    elseif args[1]=="adjust" and args[2]=="activate" then
+      local n = tonumber(args[3])
+      if n and n>=0 and n<=1 then
+        settings.activateAt = n
+        saveSettings()
+        rednet.send(e[2], "Adjusted.", "power")
+      else
+        rednet.send(e[2], "Invalid argument. (0 <= n <= 1)", "power")
+      end
+    elseif args[1]=="adjust" and args[2]=="deactivate" then
+      local n = tonumber(args[3])
+      if n and n>=0 and n<=1 then
+        settings.deactivateAt = n
+        saveSettings()
+        rednet.send(e[2], "Adjusted.", "power")
+      else
+        rednet.send(e[2], "Invalid argument. (0 <= n <= 1)", "power")
+      end
+      rednet.send(e[2], "Adjusted.", "power")
+    else
+      rednet.send(e[2], "Invalid argument.", "power")
     end
   end
 end
