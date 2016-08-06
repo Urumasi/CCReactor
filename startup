@@ -2,7 +2,7 @@ local peripheral, fs, textutils, math =
       peripheral, fs, textutils, math
 
 local settings = {
-  activateAt = 0.5,
+  activateAt = 0.3,
   deactivateAt = 0.9,
   maxStored = 10e6
 }
