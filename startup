@@ -113,11 +113,11 @@ while true do
     break
   elseif e[1]=="monitor_touch" then
     if e[3]==w then
-      local p = (h-1-e[4])/(h-2)
+      local p = h-1-e[4]
       if moving==0 then
-        if math.abs(math.floor(p)-math.floor(settings.activateAt*(h-2)))<=1 then
+        if math.abs(p-settings.activateAt*(h-2))<=1 then
           moving = 1
-        elseif math.abs(math.floor(p)-math.floor(settings.deactivateAt*(h-2)))<=1 then
+        elseif math.abs(p-settings.deactivateAt*(h-2))<=1 then
           moving = 2
         end
       elseif moving==1 then
