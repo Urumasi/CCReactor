@@ -121,14 +121,14 @@ while true do
           moving = 2
         end
       elseif moving==1 then
-        term.setCursorPos(w-1, e[4])
+        term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
         term.setBackgroundColor(colors.black)
         write(" ")
         settings.activateAt = p/(h-2)
         moving = 0
         saveSettings()
       else
-        term.setCursorPos(w-1, e[4])
+        term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
         term.setBackgroundColor(colors.black)
         write(" ")
         settings.deactivateAt = p(h-2)
