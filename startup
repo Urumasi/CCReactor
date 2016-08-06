@@ -10,6 +10,9 @@ local settings = {
   maxStored = 10e6
 }
 
+rednet.open("left")
+rednet.host("power", "main")
+
 local reactor = peripheral.wrap("right")
 local monitor = peripheral.wrap("front")
 monitor.setBackgroundColor(colors.black)
@@ -64,7 +67,7 @@ end
 
 local function drawBar()
   drawRect(w-8, 2, w-2, h-1, colors.gray)
-  local level = (w-2)*current/settings.maxStored
+  local level = (h-2)*current/settings.maxStored
   drawRect(w-8, h-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
   if level-math.floor(level)>=0.5 then
     drawRect(w-8, h-1-math.floor(level), w-2, h-1-math.floor(level), charge and colors.brown or colors.green)
@@ -115,8 +118,8 @@ while true do
   if e[1]=="timer" then
     readReactor()
     doStuff()
-    drawBar()
     drawInfo()
+    drawBar()
     os.startTimer(0.5)
   elseif e[1]=="terminate" then
     break
@@ -140,10 +143,16 @@ while true do
         term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
         term.setBackgroundColor(colors.black)
         write(" ")
-        settings.deactivateAt = p(h-2)
+        settings.deactivateAt = p/(h-2)
         moving = 0
         saveSettings()
       end
+    end
+  elseif e[1]=="rednet_message" and e[4]=="power" then
+    if e[3]=="summary" then
+      rednet.send(e[2], "Status: "..(charge and "ON" or "OFF")
+        .."\nPower: "..(math.floor(1000*current/settings.maxStored)/10).."%"
+        .."\nProduction: "..numToString(production).."RF/t", "power")
     end
   end
 end
