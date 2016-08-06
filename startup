@@ -1,0 +1,38 @@
+local peripheral, fs, textutils, math = 
+      peripheral, fs, textutils, math
+
+local settings = {
+  activateAt = 0.5,
+  deactivateAt = 0.8,
+}
+
+local reactor = peripheral.wrap("right")
+local monitor = peripheral.wrap("front")
+monitor.setTextScale(0.5)
+local w, h = monitor.getSize()
+term.redirect(monitor)
+
+local settingsPath = "data/settings"
+
+local function saveSettings()
+  local f = fs.open(settingsPath, "w")
+  if not f then return false end
+  f.write(textutils.serialize(state))
+  f.close()
+  return true
+end
+
+local function loadSettings()
+  if not fs.exists(settingsPath) or fs.isDir(settingsPath) then return false end
+  local f = fs.open(settingsPath, "r")
+  settings = textutils.unserialize(f.readAll())
+  f.close()
+  return true
+end
+
+local function drawBar()
+  paintutils.drawBox(w-5, 2, w-1, h-1, colors.gray)
+end
+
+loadSettings()
+drawBar()
