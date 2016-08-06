@@ -1,5 +1,8 @@
-local peripheral, fs, textutils, math = 
-      peripheral, fs, textutils, math
+local peripheral, fs, textutils, math, term, os = 
+      peripheral, fs, textutils, math, term, os
+
+local oldPullEvent = os.pullEvent
+os.pullEvent = os.pullEventRaw
 
 local settings = {
   activateAt = 0.3,
@@ -18,6 +21,8 @@ term.redirect(monitor)
 local production = 0
 local current = 0
 local charge = false
+
+local moving = 0 -- 0=none, 1=green marker, 2=red marker
 
 local settingsPath = "data/settings"
 
@@ -60,10 +65,10 @@ local function drawBar()
   term.setBackgroundColor(colors.black)
   term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
   term.setTextColor(colors.lime)
-  write("<")
+  write(moving==1 and "#" or "<")
   term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
   term.setTextColor(colors.red)
-  write("<")
+  write(moving==2 and "#" or "<")
 end
 
 local function doStuff()
@@ -86,10 +91,36 @@ end
 
 loadSettings()
 
+os.startTimer(0.5)
 while true do
-  readReactor()
-  doStuff()
-  drawBar()
-
-  sleep(0.5)
+  local e = {os.pullEvent()}
+  if e[1]=="timer" then
+    readReactor()
+    doStuff()
+    drawBar()
+    os.startTimer(0.5)
+  elseif e[1]=="terminate" then
+    break
+  elseif e[1]=="monitor_touch" then
+    if e[3]==w-1 then
+      local p = (h-1-e[4])/settings.maxStored
+      if moving==0 then
+        if math.floor(p)==math.floor(settings.activateAt*(h-2)) then
+          moving = 1
+        elseif math.floor(p)==math.floor(settings.deactivateAt*(h-2)) then
+          moving = 2
+        end
+      elseif moving==1 then
+        settings.activateAt = p/(h-2)
+        moving = 0
+        saveSettings()
+      else
+        settings.deactivateAt = p(h-2)
+        moving = 0
+        saveSettings()
+      end
+    end
+  end
 end
+
+os.pullEvent = oldPullEvent
