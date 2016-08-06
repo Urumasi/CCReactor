@@ -71,6 +71,15 @@ local function drawBar()
   write(moving==2 and "#" or "<")
 end
 
+local function drawInfo()
+  term.setTextColor(colors.yellow)
+  term.setBackgroundColor(colors.black)
+  term.setCursorPos(2, 2)
+  write("Status: "..(charge and "ON " or "OFF"))
+  term.setCursorPos(2, 4)
+  write("Power: "..(math.floor(1000*current/settings.maxStored)/10).."%    ")
+end
+
 local function doStuff()
   local p = current/settings.maxStored
 
@@ -98,6 +107,7 @@ while true do
     readReactor()
     doStuff()
     drawBar()
+    drawInfo()
     os.startTimer(0.5)
   elseif e[1]=="terminate" then
     break
