@@ -44,7 +44,7 @@ end
 local function drawBar()
   paintutils.drawFilledBox(w-8, 2, w-2, h-1, colors.gray)
   local level = (w-2)*current/settings.maxStored
-  paintutils.drawFilledBox(w-8, h-1-math.floor(level), h-1, w-2, charge and colors.yellow or colors.lime)
+  paintutils.drawFilledBox(w-8, h-1-math.floor(level), w-2, h-1, charge and colors.yellow or colors.lime)
   if level-math.floor(level)>=0.5 then
     paintutis.drawLine(w-8, h-2-math.floor(level), w-2, h-2-math.floor(level), charge and colors.brown or colors.green)
   end
