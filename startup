@@ -112,19 +112,25 @@ while true do
   elseif e[1]=="terminate" then
     break
   elseif e[1]=="monitor_touch" then
-    if e[3]==w-1 then
-      local p = (h-1-e[4])/settings.maxStored
+    if e[3]==w then
+      local p = (h-1-e[4])/(h-2)
       if moving==0 then
-        if math.floor(p)==math.floor(settings.activateAt*(h-2)) then
+        if math.abs(math.floor(p)-math.floor(settings.activateAt*(h-2)))<=1 then
           moving = 1
-        elseif math.floor(p)==math.floor(settings.deactivateAt*(h-2)) then
+        elseif math.abs(math.floor(p)-math.floor(settings.deactivateAt*(h-2)))<=1 then
           moving = 2
         end
       elseif moving==1 then
+        term.setCursorPos(w-1, e[4])
+        term.setBackgroundColor(colors.black)
+        write(" ")
         settings.activateAt = p/(h-2)
         moving = 0
         saveSettings()
       else
+        term.setCursorPos(w-1, e[4])
+        term.setBackgroundColor(colors.black)
+        write(" ")
         settings.deactivateAt = p(h-2)
         moving = 0
         saveSettings()
