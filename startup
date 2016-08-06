@@ -60,7 +60,7 @@ local function numToString(n)
   return (math.floor(n*10)/10)..(sufix[a] or "?")
 end
 
-function string:split(sep)
+local function explode(self, sep)
   local sep, fields = sep or ":", {}
   local pattern = string.format("([^%s]+)", sep)
   self:gsub(pattern, function(c) fields[#fields+1] = c end)
@@ -117,6 +117,19 @@ local function doStuff()
   end
 end
 
+local function adjust(a, n)
+  term.setBackgroundColor(colors.black)
+  if a then
+    term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
+    settings.activateAt = n
+  else
+    term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
+    settings.deactivateAt = n
+  end
+  write(" ")
+  saveSettings()
+end
+
 loadSettings()
 
 os.startTimer(0.5)
@@ -140,23 +153,15 @@ while true do
           moving = 2
         end
       elseif moving==1 then
-        term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.activateAt))
-        term.setBackgroundColor(colors.black)
-        write(" ")
-        settings.activateAt = p/(h-2)
+        adjust(true, p/(h-2))
         moving = 0
-        saveSettings()
       else
-        term.setCursorPos(w-1, h-1-math.floor((h-2)*settings.deactivateAt))
-        term.setBackgroundColor(colors.black)
-        write(" ")
-        settings.deactivateAt = p/(h-2)
+        adjust(false, p/(h-2))
         moving = 0
-        saveSettings()
       end
     end
   elseif e[1]=="rednet_message" and e[4]=="power" then
-    local args = e[3]:explode(";")
+    local args = explode(e[3], ";")
     if args[1]=="summary" then
       rednet.send(e[2], "Status: "..(charge and "ON" or "OFF")
         .."\nPower: "..(math.floor(1000*current/settings.maxStored)/10).."%"
@@ -164,8 +169,7 @@ while true do
     elseif args[1]=="adjust" and args[2]=="activate" then
       local n = tonumber(args[3])
       if n and n>=0 and n<=1 then
-        settings.activateAt = n
-        saveSettings()
+        adjust(true, n)
         rednet.send(e[2], "Adjusted.", "power")
       else
         rednet.send(e[2], "Invalid argument. (0 <= n <= 1)", "power")
@@ -173,8 +177,7 @@ while true do
     elseif args[1]=="adjust" and args[2]=="deactivate" then
       local n = tonumber(args[3])
       if n and n>=0 and n<=1 then
-        settings.deactivateAt = n
-        saveSettings()
+        adjust(false, n)
         rednet.send(e[2], "Adjusted.", "power")
       else
         rednet.send(e[2], "Invalid argument. (0 <= n <= 1)", "power")
